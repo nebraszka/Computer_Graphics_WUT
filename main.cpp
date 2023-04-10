@@ -168,6 +168,9 @@ int main()
     // On window resize
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); 
 
+    // Wireframe mode activated
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
     // Show window
     while(!glfwWindowShouldClose(window))
     {
