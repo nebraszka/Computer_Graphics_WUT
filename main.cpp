@@ -107,14 +107,13 @@ int main()
     glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
     if(!success) {
         glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        ...
+        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
     }
-
-    glUseProgram(shaderProgram);
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
-    // Loading the vertices into vertex buffer objects (VBO)
+    // ---------------------------------------------------------------------------
+
     float vertices[] = {
     -0.5f, -0.5f, 0.0f,
      0.5f, -0.5f, 0.0f,
@@ -122,9 +121,20 @@ int main()
     };
     unsigned int VBO;
     glGenBuffers(1, &VBO); 
+
+    // Loading the vertices into vertex buffer objects (VBO)
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
+    // Set the vertex attributes pointers
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);  
+
+    // Use shader program when we want to render an object
+    glUseProgram(shaderProgram);
+
+    
+    
     /*
      *  Note:
      *  Modern OpenGL requires that we at least set up a vertex and fragment shader if we want to do some rendering
@@ -141,7 +151,7 @@ int main()
 
         //Rendering
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT); 
 
         // There are 2 buffers - back and front buffer
         glfwSwapBuffers(window);
