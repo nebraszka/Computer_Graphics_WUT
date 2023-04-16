@@ -109,6 +109,7 @@ int main()
      * just like a vertex buffer object, that stores indices 
      * that OpenGL uses to decide what vertices to draw. 
      */
+
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
@@ -150,7 +151,6 @@ int main()
         // Rendering
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT); 
-
         // Change uniform color
         // float timeValue = glfwGetTime();
         // float greenValue = (sin(timeValue) / 2.0f) + 0.8f;
