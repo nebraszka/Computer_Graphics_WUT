@@ -4,10 +4,14 @@ project(MyProject)
 set(CMAKE_CXX_STANDARD 11)
 
 # Add source files
-set(SOURCE_FILES main.cpp)
+set(SOURCE_FILES main.cpp Shader.h)
+
+file(GLOB SHADER_FILES shaders/*)
 
 # Add executable
 add_executable(MyProject ${SOURCE_FILES} glad/glad.o)
 
+target_include_directories(MyProject PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
 # Add libraries
-target_link_libraries(MyProject glfw dl)
+target_link_libraries(MyProject glfw dl m)
