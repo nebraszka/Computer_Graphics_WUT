@@ -7,17 +7,20 @@
 
 #include "glad/glad.h"
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
 #include <math.h>
 
-#include <Shader.h>
+#include <Shader.hpp>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 
-#define WINDOW_WIDTH 800 
-#define WINDOW_HEIGHT 600
+#define WINDOW_WIDTH 1000 
+#define WINDOW_HEIGHT 800
 
 int main()
 {
@@ -137,7 +140,7 @@ int main()
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); 
 
     // Wireframe mode activated
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     // Show window
     while(!glfwWindowShouldClose(window))
@@ -153,8 +156,21 @@ int main()
         // float greenValue = (sin(timeValue) / 2.0f) + 0.8f;
         // int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
         // glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
-
         ourShader.use();
+
+        /* NOTE: Remember that the actual transformation order should be read in reverse:
+         * even though in code we first translate and then later rotate,
+         * the actual transformations first apply a rotation and then a translation. 
+         */ 
+
+        // Translation
+        glm::mat4 trans = glm::mat4(1.0f);
+        trans = glm::translate(trans, glm::vec3(0.2f, -0.2f, 0.0f));
+        // Rotation
+        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(1.0f, 0.0f, 1.0f));
+
+        unsigned int transformLoc = glGetUniformLocation(ourShader.ID, "transform");
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
         
         // Render triangles
         glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
