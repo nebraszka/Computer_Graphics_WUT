@@ -1,13 +1,18 @@
 cmake_minimum_required(VERSION 3.10)
-project(MyProject)
+project(VirtualCameraMN)
 
 set(CMAKE_CXX_STANDARD 11)
 
 # Add source files
-set(SOURCE_FILES main.cpp)
+set(SOURCE_FILES main.cpp Shader.hpp)
+
+file(GLOB SHADER_FILES shaders/*)
 
 # Add executable
-add_executable(MyProject ${SOURCE_FILES} glad/glad.o)
+add_executable(VirtualCameraMN ${SOURCE_FILES} glad/glad.o)
+
+# To make Shader.hpp visible
+target_include_directories(VirtualCameraMN PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Add libraries
-target_link_libraries(MyProject glfw dl)
+target_link_libraries(VirtualCameraMN glfw dl m)
