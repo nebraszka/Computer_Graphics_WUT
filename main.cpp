@@ -140,10 +140,24 @@ int main()
      */
     glBindVertexArray(VAO);
 
-    // Loading the vertices into Vertex Buffer Objects (VBO)
+    /* Loading the vertices into Vertex Buffer Objects (VBO)
+     *
+     * We manage this memory via so called vertex buffer objects (VBO)
+     * that can store a large number of vertices in the GPU's memory. 
+     * The advantage of using those buffer objects is that we can send 
+     * large batches of data all at once to the graphics card, 
+     * and keep it there if there's enough memory left, 
+     * without having to send data one vertex at a time.
+     * 
+     * Source: https://learnopengl.com/Getting-started/Hello-Triangle
+     */
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
+    /* An EBO (element buffer objects) is a buffer, 
+     * just like a vertex buffer object, that stores indices 
+     * that OpenGL uses to decide what vertices to draw. 
+     */
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
@@ -161,7 +175,9 @@ int main()
     
     /*
      *  Note:
-     *  Modern OpenGL requires that we at least set up a vertex and fragment shader if we want to do some rendering
+     *  Modern OpenGL requires that we at least set up a vertex and 
+     *  fragment shader if we want to do some rendering
+     * 
      *  Source: https://learnopengl.com/Getting-started/Hello-Triangle
      */
 
