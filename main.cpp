@@ -10,6 +10,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/rotate_vector.hpp>
 
 #include <iostream>
 #include <math.h>
@@ -24,30 +25,19 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 #define WINDOW_WIDTH 1000 
 #define WINDOW_HEIGHT 800
 
-// camera
+// camera - start position
 glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f,  3.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
 
 
 bool firstMouse = true;
-float yaw   = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
-float pitch =  0.0f;
 float lastX =  800.0f / 2.0;
 float lastY =  600.0 / 2.0;
 float fov   =  45.0f;
 
 int main()
 {
-    /*
-     *  Note:
-     *  GLFW is a library, written in C, specifically targeted at OpenGL.
-     *  GLFW gives us the bare necessities required for rendering goodies to the screen.
-     *  It allows us to create an OpenGL context, define window parameters, 
-     *  and handle user input, which is plenty enough for our purposes. 
-     * 
-     *  Source: https://learnopengl.com/Getting-started/Creating-a-window
-     */
 
     // Configuration of GLFW
     glfwInit();
@@ -86,47 +76,47 @@ int main()
     // ---------------------------------------------------------------------------
 
     float vertices[] = {
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+    -0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f,  0.5f, -0.5f,
+     0.5f,  0.5f, -0.5f,
+    -0.5f,  0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
 
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f, -0.5f,  0.5f,
+     0.5f, -0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f,  0.5f,
+    -0.5f, -0.5f,  0.5f,
 
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+    -0.5f, -0.5f,  0.5f,
+    -0.5f,  0.5f,  0.5f,
 
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,
+     0.5f,  0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
 
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f,  0.5f,
+     0.5f, -0.5f,  0.5f,
+    -0.5f, -0.5f,  0.5f,
+    -0.5f, -0.5f, -0.5f,
 
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+    -0.5f,  0.5f, -0.5f,
+     0.5f,  0.5f, -0.5f,
+     0.5f,  0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f, -0.5f
     };
 
     // world space positions of our cubes
@@ -148,50 +138,20 @@ int main()
     glGenVertexArrays(1, &VAO); 
     glGenBuffers(1, &VBO);
 
-    /* Binding Vertex Array Object (VAO)
-     *
-     * This has the advantage that when configuring vertex attribute pointers
-     * you only have to make those calls once and whenever we want to draw the object,
-     * we can just bind the corresponding VAO
-     * 
-     * Source: https://learnopengl.com/Getting-started/Hello-Triangle
-     */
+    // Binding Vertex Array Object (VAO)
     glBindVertexArray(VAO);
 
-    /* Loading the vertices into Vertex Buffer Objects (VBO)
-     *
-     * We manage this memory via so called vertex buffer objects (VBO)
-     * that can store a large number of vertices in the GPU's memory. 
-     * The advantage of using those buffer objects is that we can send 
-     * large batches of data all at once to the graphics card, 
-     * and keep it there if there's enough memory left, 
-     * without having to send data one vertex at a time.
-     * 
-     * Source: https://learnopengl.com/Getting-started/Hello-Triangle
-     */
+    // Loading the vertices into Vertex Buffer Objects (VBO)
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     // Set the vertex attributes pointers
     //  position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    /* note that this is allowed, 
-     * the call to glVertexAttribPointer registered VBO
-     * as the vertex attribute's bound vertex buffer object
-     * so afterwards we can safely unbind
-     */
     glBindBuffer(GL_ARRAY_BUFFER, 0); 
     glBindVertexArray(0);  
-    
-    /*
-     *  Note:
-     *  Modern OpenGL requires that we at least set up a vertex and 
-     *  fragment shader if we want to do some rendering
-     * 
-     *  Source: https://learnopengl.com/Getting-started/Hello-Triangle
-     */
 
     // On window resize
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); 
@@ -200,9 +160,6 @@ int main()
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     glm::mat4 view;
-    view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f), 
-            glm::vec3(0.0f, 0.0f, 0.0f), 
-            glm::vec3(0.0f, 1.0f, 0.0f));
 
     // Show window
     while(!glfwWindowShouldClose(window))
@@ -219,27 +176,14 @@ int main()
         // int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
         // glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
         ourShader.use();
-
-        /* NOTE: Remember that the actual transformation order should be read in reverse:
-         * even though in code we first translate and then later rotate,
-         * the actual transformations first apply a rotation and then a translation. 
-         */ 
-
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::rotate(model, glm::radians(50.0f), glm::vec3(1.0f, 1.0f, 0.0f));
-
-        glm::mat4 view = glm::mat4(1.0f);
-        // note that we're translating the scene in the reverse direction of where we want to move
-        const float radius = 10.0f;
-        float camX = sin(glfwGetTime()) * radius;
-        float camZ = cos(glfwGetTime()) * radius;
+ 
         view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-
-        glm::mat4 projection;
-        projection = glm::perspective(glm::radians(fov), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
 
         unsigned int viewLoc = glGetUniformLocation(ourShader.ID, "view");
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+
+        glm::mat4 projection;
+        projection = glm::perspective(glm::radians(fov), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
 
         unsigned int projectionLoc = glGetUniformLocation(ourShader.ID, "projection");
         glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
@@ -288,6 +232,24 @@ void processInput(GLFWwindow *window)
         cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+        cameraUp = glm::normalize(glm::rotate(cameraUp, glm::radians(1.0f), cameraFront));
+    }
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
+        cameraUp = glm::normalize(glm::rotate(cameraUp, glm::radians(-1.0f), cameraFront));
+    };
+    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
+        cameraFront = glm::normalize(glm::rotate(cameraFront, glm::radians(1.0f), cameraUp));
+    };
+    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
+        cameraFront = glm::normalize(glm::rotate(cameraFront, glm::radians(-1.0f), cameraUp));
+    };
+    if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) {
+        cameraFront = glm::normalize(glm::rotate(cameraFront, glm::radians(1.0f), glm::cross(cameraFront, cameraUp)));
+    };
+    if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS) {
+        cameraFront = glm::normalize(glm::rotate(cameraFront, glm::radians(-1.0f), glm::cross(cameraFront, cameraUp)));
+    };
 }
 
 
@@ -312,20 +274,9 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
     xoffset *= sensitivity;
     yoffset *= sensitivity;
 
-    yaw += xoffset;
-    pitch += yoffset;
+    cameraFront = glm::normalize(glm::rotate(cameraFront, glm::radians(-xoffset), cameraUp));
 
-    // make sure that when pitch is out of bounds, screen doesn't get flipped
-    if (pitch > 89.0f)
-        pitch = 89.0f;
-    if (pitch < -89.0f)
-        pitch = -89.0f;
-
-    glm::vec3 front;
-    front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-    front.y = sin(glm::radians(pitch));
-    front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-    cameraFront = glm::normalize(front);
+    cameraFront = glm::normalize(glm::rotate(cameraFront, glm::radians(yoffset), glm::cross(cameraFront, cameraUp)));
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
