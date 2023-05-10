@@ -35,6 +35,7 @@ bool firstMouse = true;
 float lastX =  800.0f / 2.0;
 float lastY =  600.0 / 2.0;
 float fov   =  45.0f;
+float pitch =  0.0f;
 
 int main()
 {
@@ -233,23 +234,45 @@ void processInput(GLFWwindow *window)
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
     if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
-        cameraUp = glm::normalize(glm::rotate(cameraUp, glm::radians(1.0f), cameraFront));
+        cameraUp = glm::rotate(cameraUp, glm::radians(1.0f), cameraFront);
     }
     if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
-        cameraUp = glm::normalize(glm::rotate(cameraUp, glm::radians(-1.0f), cameraFront));
-    };
+        cameraUp = glm::rotate(cameraUp, glm::radians(-1.0f), cameraFront);
+    }
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
-        cameraFront = glm::normalize(glm::rotate(cameraFront, glm::radians(1.0f), cameraUp));
-    };
+        cameraFront = glm::rotate(cameraFront, glm::radians(1.0f), cameraUp);
+    }
     if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
-        cameraFront = glm::normalize(glm::rotate(cameraFront, glm::radians(-1.0f), cameraUp));
-    };
+        cameraFront = glm::rotate(cameraFront, glm::radians(-1.0f), cameraUp);
+    }
     if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) {
-        cameraFront = glm::normalize(glm::rotate(cameraFront, glm::radians(1.0f), glm::cross(cameraFront, cameraUp)));
-    };
+
+        pitch += 1.0f;
+        if (pitch > 89.0f) {
+            pitch = 89.0f;
+            return;
+        }
+        if (pitch < -89.0f) {
+            pitch = -89.0f;
+            return;
+        }
+
+        cameraFront = glm::rotate(cameraFront, glm::radians(1.0f), glm::normalize(glm::cross(cameraFront, cameraUp)));
+    }
     if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS) {
-        cameraFront = glm::normalize(glm::rotate(cameraFront, glm::radians(-1.0f), glm::cross(cameraFront, cameraUp)));
-    };
+
+        pitch -= 1.0f;
+        if (pitch > 89.0f) {
+            pitch = 89.0f;
+            return;
+        }
+        if (pitch < -89.0f) {
+            pitch = -89.0f;
+            return;
+        }
+
+        cameraFront = glm::rotate(cameraFront, glm::radians(-1.0f), glm::normalize(glm::cross(cameraFront, cameraUp)));
+    }
 }
 
 
@@ -257,6 +280,9 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 {
     float xpos = static_cast<float>(xposIn);
     float ypos = static_cast<float>(yposIn);
+
+    float lastXtmp = lastX;
+    float lastYtmp = lastY;
 
     if (firstMouse)
     {
@@ -274,9 +300,11 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
     xoffset *= sensitivity;
     yoffset *= sensitivity;
 
-    cameraFront = glm::normalize(glm::rotate(cameraFront, glm::radians(-xoffset), cameraUp));
+    pitch += yoffset;
 
-    cameraFront = glm::normalize(glm::rotate(cameraFront, glm::radians(yoffset), glm::cross(cameraFront, cameraUp)));
+    cameraFront = glm::rotate(cameraFront, glm::radians(-xoffset), cameraUp);
+
+    cameraFront = glm::rotate(cameraFront, glm::radians(yoffset), glm::normalize(glm::cross(cameraFront, cameraUp)));
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
