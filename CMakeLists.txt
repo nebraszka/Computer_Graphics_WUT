@@ -6,8 +6,6 @@ set(CMAKE_CXX_STANDARD 11)
 # Add source files
 set(SOURCE_FILES main.cpp Shader.hpp)
 
-file(GLOB SHADER_FILES shaders/*)
-
 # Add executable
 add_executable(VirtualCameraMN ${SOURCE_FILES} glad/glad.o)
 
