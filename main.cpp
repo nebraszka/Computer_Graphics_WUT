@@ -16,17 +16,14 @@
 
 #include <iostream>
 #include <vector>
-#include <filesystem>
 #include <algorithm>
 
+#include <painterAlgorithm.hpp>
 #include <Shader.hpp>
-#include <face.hpp>
 #include <model.hpp>
 
 #define WINDOW_WIDTH 1000
 #define WINDOW_HEIGHT 800
-
-Cube cube;
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
@@ -121,15 +118,6 @@ int main() {
 
     glm::mat4 view;
 
-    std::vector<Face> cubeFaces;
-    cubeFaces.reserve(6);
-    cubeFaces.emplace_back(Face{.vertices = frontVertices, .startIndex = 0});
-    cubeFaces.emplace_back(Face{.vertices = backVertices, .startIndex = 6});
-    cubeFaces.emplace_back(Face{.vertices = leftVertices, .startIndex = 12});
-    cubeFaces.emplace_back(Face{.vertices = rightVertices, .startIndex = 18});
-    cubeFaces.emplace_back(Face{.vertices = bottomVertices, .startIndex = 24});
-    cubeFaces.emplace_back(Face{.vertices = topVertices, .startIndex = 30});
-
     // Show window
     while (!glfwWindowShouldClose(window)) {
         processInput(window);
@@ -165,16 +153,11 @@ int main() {
             unsigned int modelLoc = glGetUniformLocation(ourShader.ID, "model");
             glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
-            cube = Cube{.faces = cubeFaces};
-            for (auto &face: cube.faces) {
-                face.transformVertices(model);
-                face.countDistanceFromCenterToCamera(cameraPos);
-            }
+            glm::mat4 transform = model;
+            std::vector<int> results = getIndexesOrder(transform, cameraPos);
 
-            cube.sortByDistanceToCamera();
-
-            for (auto &face: cube.faces) {
-                glDrawArrays(GL_TRIANGLES, face.startIndex, 6);
+            for (auto &index: results) {
+                glDrawArrays(GL_TRIANGLES, index, 6);
             }
         }
 

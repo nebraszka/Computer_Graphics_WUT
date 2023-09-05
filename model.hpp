@@ -2,88 +2,7 @@
 
 #include <glm/glm.hpp>
 
-const std::vector<glm::vec4> frontVertices = {
-        {glm::vec4(-0.5f, -0.5f, 0.5f, 1.0f),
-         glm::vec4(0.5f, -0.5f, 0.5f, 1.0f),
-         glm::vec4(0.5f, 0.5f, 0.5f, 1.0f),
-         glm::vec4(0.5f, 0.5f, 0.5f, 1.0f),
-         glm::vec4(-0.5f, 0.5f, 0.5f, 1.0f),
-         glm::vec4(-0.5f, -0.5f, 0.5f, 1.0f)}};
-
-const std::vector<glm::vec4> backVertices = {
-        {glm::vec4(-0.5f, -0.5f, -0.5f, 1.0f),
-         glm::vec4(0.5f, -0.5f, -0.5f, 1.0f),
-         glm::vec4(0.5f, 0.5f, -0.5f, 1.0f),
-         glm::vec4(0.5f, 0.5f, -0.5f, 1.0f),
-         glm::vec4(-0.5f, 0.5f, -0.5f, 1.0f),
-         glm::vec4(-0.5f, -0.5f, -0.5f, 1.0f)}};
-
-const std::vector<glm::vec4> leftVertices = {
-        {glm::vec4(-0.5f, -0.5f, 0.5f, 1.0f),
-         glm::vec4(-0.5f, -0.5f, -0.5f, 1.0f),
-         glm::vec4(-0.5f, 0.5f, -0.5f, 1.0f),
-         glm::vec4(-0.5f, 0.5f, -0.5f, 1.0f),
-         glm::vec4(-0.5f, 0.5f, 0.5f, 1.0f),
-         glm::vec4(-0.5f, -0.5f, 0.5f, 1.0f)}};
-
-const std::vector<glm::vec4> rightVertices = {
-        {glm::vec4(0.5f, -0.5f, 0.5f, 1.0f),
-         glm::vec4(0.5f, -0.5f, -0.5f, 1.0f),
-         glm::vec4(0.5f, 0.5f, -0.5f, 1.0f),
-         glm::vec4(0.5f, 0.5f, -0.5f, 1.0f),
-         glm::vec4(0.5f, 0.5f, 0.5f, 1.0f),
-         glm::vec4(0.5f, -0.5f, 0.5f, 1.0f)}};
-
-const std::vector<glm::vec4> bottomVertices = {
-        {glm::vec4(-0.5f, -0.5f, -0.5f, 1.0f),
-         glm::vec4(0.5f, -0.5f, -0.5f, 1.0f),
-         glm::vec4(0.5f, -0.5f, 0.5f, 1.0f),
-         glm::vec4(0.5f, -0.5f, 0.5f, 1.0f),
-         glm::vec4(-0.5f, -0.5f, 0.5f, 1.0f),
-         glm::vec4(-0.5f, -0.5f, -0.5f, 1.0f)}};
-
-const std::vector<glm::vec4> topVertices = {
-        {glm::vec4(-0.5f, 0.5f, -0.5f, 1.0f),
-         glm::vec4(0.5f, 0.5f, -0.5f, 1.0f),
-         glm::vec4(0.5f, 0.5f, 0.5f, 1.0f),
-         glm::vec4(0.5f, 0.5f, 0.5f, 1.0f),
-         glm::vec4(-0.5f, 0.5f, 0.5f, 1.0f),
-         glm::vec4(-0.5f, 0.5f, -0.5f, 1.0f)}};
-
-struct Face {
-    std::vector<glm::vec4> vertices;
-    int startIndex;
-    float distanceToCamera;
-
-    void transformVertices(glm::mat4 transformMatrix) {
-        for (auto &vertex: vertices) {
-            vertex = transformMatrix * vertex;
-        }
-    }
-
-    void countDistanceFromCenterToCamera(glm::vec3 cameraPosition) {
-        // Average of distances from camera to each vertex
-        distanceToCamera = 0;
-        for (auto &vertex: vertices) {
-            distanceToCamera += glm::distance(cameraPosition, glm::vec3(vertex));
-        }
-        distanceToCamera /= vertices.size();
-
-    }
-};
-
-struct Cube {
-    std::vector<Face> faces;
-
-    void sortByDistanceToCamera() {
-        std::sort(faces.begin(), faces.end(), [](const Face &a, const Face &b) {
-            // The most far should be first
-            return a.distanceToCamera > b.distanceToCamera;
-        });
-    }
-};
-
-float verticesWithColors[] = {
+const float verticesWithColors[] = {
         // positions          // colors
         -0.5f, -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, // green, front
         0.5f, -0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
@@ -127,6 +46,54 @@ float verticesWithColors[] = {
         -0.5f, 0.5f, 0.5f, 1.0f, 0.5f, 0.0f,
         -0.5f, 0.5f, -0.5f, 1.0f, 0.5f, 0.0f,
 };
+
+const std::vector<glm::vec4> frontVertices = {
+        glm::vec4(-0.5f, -0.5f, 0.5f, 1.0f),
+        glm::vec4(0.5f, -0.5f, 0.5f, 1.0f),
+        glm::vec4(0.5f, 0.5f, 0.5f, 1.0f),
+        glm::vec4(0.5f, 0.5f, 0.5f, 1.0f),
+        glm::vec4(-0.5f, 0.5f, 0.5f, 1.0f),
+        glm::vec4(-0.5f, -0.5f, 0.5f, 1.0f)};
+
+const std::vector<glm::vec4> backVertices = {
+        glm::vec4(-0.5f, -0.5f, -0.5f, 1.0f),
+        glm::vec4(0.5f, -0.5f, -0.5f, 1.0f),
+        glm::vec4(0.5f, 0.5f, -0.5f, 1.0f),
+        glm::vec4(0.5f, 0.5f, -0.5f, 1.0f),
+        glm::vec4(-0.5f, 0.5f, -0.5f, 1.0f),
+        glm::vec4(-0.5f, -0.5f, -0.5f, 1.0f)};
+
+const std::vector<glm::vec4> leftVertices = {
+        glm::vec4(-0.5f, -0.5f, 0.5f, 1.0f),
+        glm::vec4(-0.5f, -0.5f, -0.5f, 1.0f),
+        glm::vec4(-0.5f, 0.5f, -0.5f, 1.0f),
+        glm::vec4(-0.5f, 0.5f, -0.5f, 1.0f),
+        glm::vec4(-0.5f, 0.5f, 0.5f, 1.0f),
+        glm::vec4(-0.5f, -0.5f, 0.5f, 1.0f)};
+
+const std::vector<glm::vec4> rightVertices = {
+        glm::vec4(0.5f, -0.5f, 0.5f, 1.0f),
+        glm::vec4(0.5f, -0.5f, -0.5f, 1.0f),
+        glm::vec4(0.5f, 0.5f, -0.5f, 1.0f),
+        glm::vec4(0.5f, 0.5f, -0.5f, 1.0f),
+        glm::vec4(0.5f, 0.5f, 0.5f, 1.0f),
+        glm::vec4(0.5f, -0.5f, 0.5f, 1.0f)};
+
+const std::vector<glm::vec4> bottomVertices = {
+        glm::vec4(-0.5f, -0.5f, -0.5f, 1.0f),
+        glm::vec4(0.5f, -0.5f, -0.5f, 1.0f),
+        glm::vec4(0.5f, -0.5f, 0.5f, 1.0f),
+        glm::vec4(0.5f, -0.5f, 0.5f, 1.0f),
+        glm::vec4(-0.5f, -0.5f, 0.5f, 1.0f),
+        glm::vec4(-0.5f, -0.5f, -0.5f, 1.0f)};
+
+const std::vector<glm::vec4> topVertices = {
+        glm::vec4(-0.5f, 0.5f, -0.5f, 1.0f),
+        glm::vec4(0.5f, 0.5f, -0.5f, 1.0f),
+        glm::vec4(0.5f, 0.5f, 0.5f, 1.0f),
+        glm::vec4(0.5f, 0.5f, 0.5f, 1.0f),
+        glm::vec4(-0.5f, 0.5f, 0.5f, 1.0f),
+        glm::vec4(-0.5f, 0.5f, -0.5f, 1.0f)};
 
 // world space positions of our cubes
 glm::vec4 cubeTranslAngle[] = {
